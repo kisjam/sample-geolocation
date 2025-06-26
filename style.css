@@ -104,6 +104,14 @@ button:active {
     color: #007bff;
 }
 
+.distance small {
+    font-size: 0.8rem;
+    color: #666;
+    font-weight: 400;
+    display: block;
+    margin-top: 5px;
+}
+
 .current-location {
     background: #f8f9fa;
     padding: 15px;

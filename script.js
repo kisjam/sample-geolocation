@@ -95,10 +95,17 @@ class LocationDistance {
             this.stations.kobe.lat, this.stations.kobe.lng
         );
         
+        // 各駅での24時間制限をチェック
+        const stationAccess = {
+            kyoto: this.checkStationAccess('kyoto', kyotoDistance <= 10),
+            osaka: this.checkStationAccess('osaka', osakaDistance <= 10),
+            kobe: this.checkStationAccess('kobe', kobeDistance <= 10)
+        };
+        
         // 結果を表示
-        this.kyotoDistance.textContent = `${kyotoDistance.toFixed(2)} km`;
-        this.osakaDistance.textContent = `${osakaDistance.toFixed(2)} km`;
-        this.kobeDistance.textContent = `${kobeDistance.toFixed(2)} km`;
+        this.kyotoDistance.innerHTML = `${kyotoDistance.toFixed(2)} km<br><small>${stationAccess.kyoto.timeInfo}</small>`;
+        this.osakaDistance.innerHTML = `${osakaDistance.toFixed(2)} km<br><small>${stationAccess.osaka.timeInfo}</small>`;
+        this.kobeDistance.innerHTML = `${kobeDistance.toFixed(2)} km<br><small>${stationAccess.kobe.timeInfo}</small>`;
         
         // エリア判定とメッセージ表示
         this.checkAreaStatus(kyotoDistance, osakaDistance, kobeDistance);
