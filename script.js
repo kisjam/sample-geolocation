@@ -257,14 +257,16 @@ class LocationDistance {
         } else if (lastAccess) {
             // エリア外だが、過去にアクセスがある場合
             const timeDiff = now - parseInt(lastAccess);
+            const elapsedTimeStr = this.formatElapsedTime(timeDiff);
+            
             if (timeDiff <= hourLimit) {
                 canAccess = true;
                 reason = '24時間以内のアクセス履歴';
                 const remainingHours = Math.ceil((hourLimit - timeDiff) / (60 * 60 * 1000));
-                timeInfo = `残り${remainingHours}時間有効`;
+                timeInfo = `前回から${elapsedTimeStr}経過 (残り${remainingHours}時間有効)`;
             } else {
                 reason = '24時間経過';
-                timeInfo = '期限切れ';
+                timeInfo = `前回から${elapsedTimeStr}経過 (期限切れ)`;
             }
         } else {
             reason = 'アクセス履歴なし';
@@ -277,6 +279,23 @@ class LocationDistance {
             timeInfo,
             isWithinRadius
         };
+    }
+    
+    formatElapsedTime(milliseconds) {
+        const seconds = Math.floor(milliseconds / 1000);
+        const minutes = Math.floor(seconds / 60);
+        const hours = Math.floor(minutes / 60);
+        const days = Math.floor(hours / 24);
+        
+        if (days > 0) {
+            return `${days}日${hours % 24}時間`;
+        } else if (hours > 0) {
+            return `${hours}時間${minutes % 60}分`;
+        } else if (minutes > 0) {
+            return `${minutes}分${seconds % 60}秒`;
+        } else {
+            return `${seconds}秒`;
+        }
     }
     
     getStationDetailsMessage(stationAccess, withinKyoto, withinOsaka, withinKobe) {
