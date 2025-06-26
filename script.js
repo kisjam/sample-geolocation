@@ -182,26 +182,120 @@ class LocationDistance {
         const withinOsaka = osakaDistance <= areaRadius;
         const withinKobe = kobeDistance <= areaRadius;
         
+        // 各駅での24時間制限をチェック
+        const stationAccess = {
+            kyoto: this.checkStationAccess('kyoto', withinKyoto),
+            osaka: this.checkStationAccess('osaka', withinOsaka),
+            kobe: this.checkStationAccess('kobe', withinKobe)
+        };
+        
         let statusMessage = '';
         let statusClass = '';
         
-        if (withinKyoto || withinOsaka || withinKobe) {
-            const nearStations = [];
+        // アクセス可能な駅があるかチェック
+        const accessibleStations = [];
+        const nearStations = [];
+        
+        if (stationAccess.kyoto.canAccess) {
+            accessibleStations.push('京都駅');
             if (withinKyoto) nearStations.push('京都駅');
+        }
+        if (stationAccess.osaka.canAccess) {
+            accessibleStations.push('新大阪駅');
             if (withinOsaka) nearStations.push('新大阪駅');
+        }
+        if (stationAccess.kobe.canAccess) {
+            accessibleStations.push('神戸駅');
             if (withinKobe) nearStations.push('神戸駅');
+        }
+        
+        if (accessibleStations.length > 0) {
+            statusMessage = `✅ アプリにアクセス可能です！\n\n`;
             
-            statusMessage = `✅ ${nearStations.join('・')}の${areaRadius}km圏内です！\nLESSERアプリにアクセス可能です。`;
+            if (nearStations.length > 0) {
+                statusMessage += `現在地: ${nearStations.join('・')}の${areaRadius}km圏内\n`;
+            }
+            
+            statusMessage += `アクセス可能駅: ${accessibleStations.join('・')}\n\n`;
+            
+            // 各駅の詳細情報
+            statusMessage += this.getStationDetailsMessage(stationAccess, withinKyoto, withinOsaka, withinKobe);
+            
             statusClass = 'area-inside';
         } else {
             const nearestStation = this.findNearestStation(kyotoDistance, osakaDistance, kobeDistance);
-            statusMessage = `⚠️ 対象エリア外です\n\n最寄り駅: ${nearestStation.name}（${nearestStation.distance.toFixed(2)}km）\n\n【クッションページ】\n駅周辺${areaRadius}km圏内でのみLESSERアプリをご利用いただけます。\n対象エリア内でもう一度お試しください。`;
+            statusMessage = `⚠️ アプリにアクセスできません\n\n最寄り駅: ${nearestStation.name}（${nearestStation.distance.toFixed(2)}km）\n\n【クッションページ】\n`;
+            
+            // 各駅の制限状況を表示
+            statusMessage += this.getStationDetailsMessage(stationAccess, withinKyoto, withinOsaka, withinKobe);
+            
+            statusMessage += `\n駅周辺${areaRadius}km圏内でのみアプリをご利用いただけます。`;
             statusClass = 'area-outside';
         }
         
         this.areaStatus.textContent = statusMessage;
         this.areaStatus.className = `area-status ${statusClass}`;
         this.areaStatus.style.display = 'block';
+    }
+    
+    checkStationAccess(stationKey, isWithinRadius) {
+        const now = Date.now();
+        const hourLimit = 24 * 60 * 60 * 1000; // 24時間
+        const storageKey = `lastAccess_${stationKey}`;
+        const lastAccess = localStorage.getItem(storageKey);
+        
+        let canAccess = false;
+        let reason = '';
+        let timeInfo = '';
+        
+        if (isWithinRadius) {
+            // エリア内にいる場合、アクセス時刻を更新
+            localStorage.setItem(storageKey, now.toString());
+            canAccess = true;
+            reason = 'エリア内';
+            timeInfo = '現在エリア内';
+        } else if (lastAccess) {
+            // エリア外だが、過去にアクセスがある場合
+            const timeDiff = now - parseInt(lastAccess);
+            if (timeDiff <= hourLimit) {
+                canAccess = true;
+                reason = '24時間以内のアクセス履歴';
+                const remainingHours = Math.ceil((hourLimit - timeDiff) / (60 * 60 * 1000));
+                timeInfo = `残り${remainingHours}時間有効`;
+            } else {
+                reason = '24時間経過';
+                timeInfo = '期限切れ';
+            }
+        } else {
+            reason = 'アクセス履歴なし';
+            timeInfo = '未アクセス';
+        }
+        
+        return {
+            canAccess,
+            reason,
+            timeInfo,
+            isWithinRadius
+        };
+    }
+    
+    getStationDetailsMessage(stationAccess, withinKyoto, withinOsaka, withinKobe) {
+        let message = '';
+        
+        const stations = [
+            { key: 'kyoto', name: '京都駅', within: withinKyoto },
+            { key: 'osaka', name: '新大阪駅', within: withinOsaka },
+            { key: 'kobe', name: '神戸駅', within: withinKobe }
+        ];
+        
+        stations.forEach(station => {
+            const access = stationAccess[station.key];
+            const status = access.canAccess ? '✅' : '❌';
+            const location = station.within ? '(圏内)' : '(圏外)';
+            message += `${status} ${station.name}${location}: ${access.timeInfo}\n`;
+        });
+        
+        return message;
     }
     
     findNearestStation(kyotoDistance, osakaDistance, kobeDistance) {
