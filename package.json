@@ -1,0 +1,14 @@
+{
+  "name": "geolocation",
+  "version": "1.0.0",
+  "description": "",
+  "homepage": "",
+  "scripts": {
+    "start": "browser-sync start --server --files '*.html, *.css, *.js, images/*' --no-notify --port 3000"
+  },
+  "devDependencies": {
+    "browser-sync": "^3.0.2"
+  },
+  "keywords": [],
+  "license": "MIT"
+}
