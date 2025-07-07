@@ -28,13 +28,27 @@
                 <h3>JR神戸駅</h3>
                 <div id="kobeDistance" class="distance">-</div>
             </div>
+            <div class="station-info">
+                <h3>京阪清水五条駅</h3>
+                <div id="shimizuDistance" class="distance">-</div>
+            </div>
+            <div class="station-info">
+                <h3>ダブルツリーbyヒルトン京都東山</h3>
+                <div id="hiltonDistance" class="distance">-</div>
+            </div>
         </div>
         
         <div id="areaStatus" class="area-status"></div>
         
         <div id="currentLocation" class="current-location"></div>
+        
+        <div id="mapContainer" class="map-container">
+            <div id="map" class="map"></div>
+        </div>
     </div>
     
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <script src="script.js"></script>
 </body>
 </html>

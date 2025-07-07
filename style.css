@@ -154,6 +154,20 @@ button:active {
     border: 1px solid #f5c6cb;
 }
 
+.map-container {
+    margin-top: 20px;
+    border-radius: 8px;
+    overflow: hidden;
+    border: 1px solid #e9ecef;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.map {
+    height: 400px;
+    width: 100%;
+    display: none;
+}
+
 @media (max-width: 768px) {
     .container {
         margin: 10px;
@@ -175,5 +189,9 @@ button:active {
     
     .distance {
         font-size: 1.5rem;
+    }
+    
+    .map {
+        height: 300px;
     }
 }

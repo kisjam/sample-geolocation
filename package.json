@@ -4,7 +4,7 @@
   "description": "",
   "homepage": "",
   "scripts": {
-    "start": "browser-sync start --server --files '*.html, *.css, *.js, images/*' --no-notify --port 3000"
+    "start": "browser-sync start --server --files '*.html, *.css, *.js, images/*' --no-notify"
   },
   "devDependencies": {
     "browser-sync": "^3.0.2"
